@@ -1,5 +1,6 @@
 #include "PacketManager.h"
 #include "packet.h"
+#include "Sender.h"
 
 PacketManager *PacketManager::INSTANCE = new PacketManager();
 
@@ -25,11 +26,12 @@ void PacketManager::run() {
     while(true) {
         if (!this->packetQueue->empty()) {
             packet = this->packetQueue->pop();
-
-            //LOG(log::DEBUG, std::string("Packet: ") + (char *) packet->data);
+            LOG_DEBUG(std::string("Packet size: ") + std::to_string(packet->size));
+            for (int i = 0; i < packet->size; i++) {
+                LOG_DEBUG(std::to_string(packet->data[i]));
+            }
+            Sender::instance()->registerPacket(packet);
         }
-
-        sleep(1);
     }
 }
 

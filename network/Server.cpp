@@ -77,9 +77,8 @@ void Server::run() {
                         msgBuffer = new uint8_t[readSize];
                         memset(msgBuffer, 0, readSize);
 
-                        int ret = recv(fd, msgBuffer, readSize, 0);
-                        LOG_DEBUG(std::string("Return value: ") + std::to_string(ret));
-                        uint8_t prdel = msgBuffer[0];
+                        recv(fd, msgBuffer, readSize, 0);
+
                         this->processData(msgBuffer, readSize, fd);
 
                     /* Client disconnected */
@@ -103,9 +102,7 @@ void Server::processData(uint8_t *data, int size, int socket) {
 
     packet->socket = socket;
 
-    LOG(log::DEBUG, std::string("Packet from ") + std::to_string(packet->socket) + " of " + std::to_string(packet->size) + " bytes");
-
-    //PacketManager::instance()->registerPacket(packet);
+    PacketManager::instance()->registerPacket(packet);
 }
 
 int Server::acceptNewConnection() {
