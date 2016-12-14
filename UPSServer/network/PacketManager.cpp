@@ -27,9 +27,6 @@ void PacketManager::run() {
         if (!this->packetQueue->empty()) {
             packet = this->packetQueue->pop();
             LOG_DEBUG(std::string("Packet size: ") + std::to_string(packet->size));
-            for (int i = 0; i < packet->size; i++) {
-                LOG_DEBUG(std::to_string(packet->data[i]));
-            }
             Sender::instance()->registerPacket(packet);
         }
     }

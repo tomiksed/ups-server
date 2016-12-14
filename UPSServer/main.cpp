@@ -2,11 +2,14 @@
 #include "network/PacketManager.h"
 #include "network/Server.h"
 #include "network/Sender.h"
+#include "datatypes/Message.h"
+#include "helpers/Serializer.h"
+
 
 #include <cstdint>
 
 int main(int argc, char *argv[]) {
-    Logger::instance()->init(log::DEBUG);
+    /*Logger::instance()->init(log::DEBUG);
 
     Sender::instance()->init();
     Sender::instance()->start();
@@ -28,6 +31,15 @@ int main(int argc, char *argv[]) {
     }
 
     std::cout << "First byte =" << std::to_string(((uint8_t *) &pokus)[0]) << std::endl; /**/
+
+    Message *pokusna = new Message(0xFF01FF02, MSG_NO_DATA);
+    int resultSize = 0;
+    uint8_t *serZprava = Serializer::instance()->serialize(pokusna, &resultSize);
+
+    for (int i = 0; i < resultSize; i++) {
+        LOG_DEBUG(std::string("") + std::to_string(serZprava[i]));
+    }
+    /**/
 
     return 0;
 }
