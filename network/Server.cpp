@@ -108,7 +108,7 @@ void Server::processData(uint8_t *data, int size, int socket) {
 int Server::acceptNewConnection() {
     int clientSocket = accept(this->serverSocket, (struct sockaddr *) &peerAddr, &lenAddr);
 
-    int optval = 1;
+    int optval = 0; /* OOO - tam ma bejt 1!!! */
     int optlen = sizeof(optval);
 
 
