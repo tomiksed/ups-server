@@ -10,6 +10,7 @@
 #define MSG_HEAD_SIZE 4
 #define MSG_SIZE_SIZE 4
 #define MSG_CHECKSUM_SIZE 1
+#define MSG_STRING_LEN_SIZE 4
 
 #define H_C_NACK          0x00000000
 #define H_C_ACK           0x00000001
@@ -26,40 +27,35 @@
 #define H_C_PL_LIST_REQ   0x00000006
 #define H_S_PL_LIST_ANS   0x00010007
 
+#define POKUSTON 0x01020304
+
 
 #include <cstdint>
 #include <vector>
+#include <string>
 
-/* ooo - reflektovat i do Serializeru!! */
-enum MessageType {
-    MSG_NO_DATA,
-    MSG_STRING,
-    MSG_INT,
-    MSG_2_INT,
-    MSG_3_INT,
-    MSG_4_INT,
-    MSG_INT_STRING
-};
+#include "../helpers/Logger.h"
+
 
 class Message {
 public:
 
-    Message(uint32_t header, MessageType msgType);
+    Message(uint32_t header, std::string format);
 
     void addData(void *data);
 
 
 
-    MessageType getMsgType() const;
+    std::string getMsgFormat();
 
-    const std::vector<void *> *getPayload() const;
+    const std::vector<void *> *getPayload();
 
-    uint32_t getHeader() const;
+    uint32_t getHeader();
 
 private:
     uint32_t header;
 
-    MessageType msgType;
+    std::string msgFormat;
 
     std::vector<void *> *payload;
 };

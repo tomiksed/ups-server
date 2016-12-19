@@ -23,6 +23,10 @@ void Server::init(uint16_t listeningPort) {
     myAddr.sin_port = htons(listeningPort);
     myAddr.sin_addr.s_addr = INADDR_ANY;
 
+    int enable = 1;
+    if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+        LOG_ERROR("AAAAAAAAAAAA");
+
     returnValue = bind(serverSocket, (struct sockaddr *) &myAddr, sizeof(struct sockaddr_in));
 
     if (returnValue != 0) {
@@ -39,6 +43,8 @@ std::thread *Server::start() {
     return this->sThread;
 }
 
+#include "../datatypes/Message.h"
+#include "../helpers/Serializer.h"
 void Server::run() {
     int fd, returnValue, readSize;
     fd_set clientSocks, readSocks;

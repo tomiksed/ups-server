@@ -4,25 +4,28 @@
 
 #include "Message.h"
 
-Message::Message(uint32_t header, MessageType msgType) {
+Message::Message(uint32_t header, std::string msgFormat) {
     this->header = header;
-    this->msgType = msgType;
+    this->msgFormat = msgFormat;
 
     this->payload = new std::vector<void *>();
 }
 
-MessageType Message::getMsgType() const {
-    return msgType;
+std::string Message::getMsgFormat() {
+    return msgFormat;
 }
 
-const std::vector<void *> *Message::getPayload() const {
+const std::vector<void *> *Message::getPayload() {
     return payload;
 }
 
 void Message::addData(void *data) {
+    if (payload->size() == msgFormat.length()) {
+        LOG_ERROR("!!! PAYLOAD IS AT MAX SIZE !!!");
+    }
     this->payload->push_back(data);
 }
 
-uint32_t Message::getHeader() const {
+uint32_t Message::getHeader() {
     return header;
 }

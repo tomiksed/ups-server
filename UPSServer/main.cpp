@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     Server::instance()->init(55555);
     std::thread *serverThread = Server::instance()->start();
 
-    serverThread->join(); /**/
+     /**/
 
     /*uint32_t pokus = (0x01 << 24) | (0x02 << 16) | (0x03 << 8) | (0x04);
     std::cout << "Pokus is: " << pokus << std::endl;
@@ -32,14 +32,52 @@ int main(int argc, char *argv[]) {
 
     std::cout << "First byte =" << std::to_string(((uint8_t *) &pokus)[0]) << std::endl; /**/
 
-    Message *pokusna = new Message(0xFF01FF02, MSG_NO_DATA);
+    /*uint32_t pokus = 5;
+    Message *pokusna = new Message(POKUSTON, std::string("siissis"));
+    pokusna->addData((void *) new std::string("Toto je pokuston pokusovaty"));
+    pokusna->addData(&pokus);
+    uint32_t pokusa = 0xa01536;
+    pokusna->addData(&pokusa);
+    pokusna->addData((void *) new std::string("didi;tomik;luisa;pepa;franta"));
+    pokusna->addData((void *) new std::string("Ahoj vole, jak se mas?"));
+    pokusna->addData(&pokus);
+    pokusna->addData((void *) new std::string("Dobre"));
+
     int resultSize = 0;
     uint8_t *serZprava = Serializer::instance()->serialize(pokusna, &resultSize);
 
-    for (int i = 0; i < resultSize; i++) {
+    Message *deserializovana = Serializer::instance()->deserialize(serZprava);
+
+    uint32_t *intPayload;
+    std::string *stringPayload;
+    const std::vector<void *> *payload = deserializovana->getPayload();
+
+    int i = 0;
+    for (char f : deserializovana->getMsgFormat()) {
+        switch (f) {
+            case 'i': {
+                intPayload = (uint32_t *) payload->at(i);
+
+                LOG_DEBUG("INT payload: " + std::to_string((*intPayload)));
+
+                break;
+            }
+            case 's': {
+                stringPayload = (std::string *) payload->at(i);
+
+                LOG_DEBUG("STRING payload: " + *stringPayload);
+
+                break;
+            }
+        }
+        i++;
+    }/**/
+
+    /*for (int i = 0; i < resultSize; i++) {
         LOG_DEBUG(std::string("") + std::to_string(serZprava[i]));
     }
     /**/
+    //serverThread->join();
 
     return 0;
 }

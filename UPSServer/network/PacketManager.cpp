@@ -19,15 +19,14 @@ void PacketManager::start() {
     this->pmThread = new std::thread(&PacketManager::run, this);
 }
 
-#include <unistd.h>
 void PacketManager::run() {
     packet_t *packet;
 
     while(true) {
         if (!this->packetQueue->empty()) {
             packet = this->packetQueue->pop();
-            LOG_DEBUG(std::string("Packet size: ") + std::to_string(packet->size));
-            Sender::instance()->registerPacket(packet);
+
+            /* ooo zpracovat packet */
         }
     }
 }
