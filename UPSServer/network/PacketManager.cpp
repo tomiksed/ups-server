@@ -1,6 +1,10 @@
 #include "PacketManager.h"
 #include "packet.h"
 #include "Sender.h"
+#include "../datatypes/Message.h"
+#include "../helpers/Serializer.h"
+#include "Server.h"
+#include "CommandManager.h"
 
 PacketManager *PacketManager::INSTANCE = new PacketManager();
 
@@ -26,7 +30,13 @@ void PacketManager::run() {
         if (!this->packetQueue->empty()) {
             packet = this->packetQueue->pop();
 
-            /* ooo zpracovat packet */
+            Message *mess = Serializer::instance()->deserialize(packet->data);
+            mess->player = Server::instance()->getPlayerBySocket(packet->socket);
+
+            CommandManager::instance()->registerCommand(mess);
+
+            delete packet->data;
+            delete packet;
         }
     }
 }

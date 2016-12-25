@@ -208,6 +208,4 @@ void fillMapWithValues(std::map<uint32_t, std::string> *headToFormatMap) {
 
     (*headToFormatMap)[H_C_PL_LIST_REQ] = std::string("");
     (*headToFormatMap)[H_S_PL_LIST_ANS] = std::string("is");
-
-    (*headToFormatMap)[POKUSTON] = std::string("siissis");
 }

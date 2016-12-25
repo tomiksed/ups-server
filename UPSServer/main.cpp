@@ -4,18 +4,22 @@
 #include "network/Sender.h"
 #include "datatypes/Message.h"
 #include "helpers/Serializer.h"
+#include "network/CommandManager.h"
 
 
 #include <cstdint>
 
 int main(int argc, char *argv[]) {
-    /*Logger::instance()->init(log::DEBUG);
+    Logger::instance()->init(log::DEBUG);
 
     Sender::instance()->init();
     Sender::instance()->start();
 
     PacketManager::instance()->init();
     PacketManager::instance()->start();
+
+    CommandManager::instance()->init();
+    CommandManager::instance()->start();
 
     Server::instance()->init(55555);
     std::thread *serverThread = Server::instance()->start();
@@ -77,7 +81,7 @@ int main(int argc, char *argv[]) {
         LOG_DEBUG(std::string("") + std::to_string(serZprava[i]));
     }
     /**/
-    //serverThread->join();
+    serverThread->join();
 
     return 0;
 }

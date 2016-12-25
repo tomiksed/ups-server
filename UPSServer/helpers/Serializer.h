@@ -21,11 +21,11 @@ public:
 
     Message *deserialize(uint8_t *data);
 
+    std::map<uint32_t, std::string> *headToFormatMap;
+
 private:
 
     static Serializer *INSTANCE;
-
-    std::map<uint32_t, std::string> *headToFormatMap;
 
     Serializer();
 

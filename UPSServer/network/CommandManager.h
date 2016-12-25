@@ -7,6 +7,11 @@
 
 #include <thread>
 
+#include "../helpers/Logger.h"
+#include "../datatypes/ConcurrentQueue.cpp"
+#include "../datatypes/Message.h"
+#include "../helpers/Serializer.h"
+
 class CommandManager {
 
 public:
@@ -15,12 +20,18 @@ public:
 
     std::thread *start();
 
+    void init();
+
+    void registerCommand(Message *message);
+
 private:
     static CommandManager *INSTANCE;
 
     CommandManager();
 
     std::thread *cmThread;
+
+    ConcurrentQueue<Message *> *commandQueue;
 
     void run();
 };

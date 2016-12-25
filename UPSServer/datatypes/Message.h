@@ -27,14 +27,13 @@
 #define H_C_PL_LIST_REQ   0x00000006
 #define H_S_PL_LIST_ANS   0x00010007
 
-#define POKUSTON 0x01020304
-
 
 #include <cstdint>
 #include <vector>
 #include <string>
 
 #include "../helpers/Logger.h"
+#include "../game/Player.h"
 
 
 class Message {
@@ -52,12 +51,15 @@ public:
 
     uint32_t getHeader();
 
+    Player *player;
+
 private:
     uint32_t header;
 
     std::string msgFormat;
 
     std::vector<void *> *payload;
+
 };
 
 

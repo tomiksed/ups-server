@@ -4,6 +4,8 @@
 
 Server *Server::INSTANCE = new Server();
 
+std::vector<Player *> *Server::players = new std::vector<Player *>();
+
 Server::Server(){}
 
 Server *Server::instance(){
@@ -25,7 +27,7 @@ void Server::init(uint16_t listeningPort) {
 
     int enable = 1;
     if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
-        LOG_ERROR("AAAAAAAAAAAA");
+        LOG_ERROR("!!! Setsockopt() SO_REUSEADDR !!!");
 
     returnValue = bind(serverSocket, (struct sockaddr *) &myAddr, sizeof(struct sockaddr_in));
 
@@ -43,8 +45,6 @@ std::thread *Server::start() {
     return this->sThread;
 }
 
-#include "../datatypes/Message.h"
-#include "../helpers/Serializer.h"
 void Server::run() {
     int fd, returnValue, readSize;
     fd_set clientSocks, readSocks;
@@ -73,6 +73,10 @@ void Server::run() {
                     LOG(log::INFO, std::string("New connection (") + std::to_string(clientSocket) + ")");
                     FD_SET(clientSocket, &clientSocks);
 
+                    /* ooo - tutu sracku dodelat */
+                    Player *p = new Player(clientSocket);
+                    Server::players->push_back(p);
+
                     /* Message from client or clients disconnection */
                 } else {
                     /* How many bytes are waiting to be read */
@@ -89,6 +93,8 @@ void Server::run() {
 
                     /* Client disconnected */
                     } else {
+                        /*  ooo - odstraneni clienta */
+
                         close(fd);
                         FD_CLR(fd, &clientSocks);
                         LOG(log::INFO, std::string("Client disconnected (") + std::to_string(fd) + ")");
@@ -114,7 +120,7 @@ void Server::processData(uint8_t *data, int size, int socket) {
 int Server::acceptNewConnection() {
     int clientSocket = accept(this->serverSocket, (struct sockaddr *) &peerAddr, &lenAddr);
 
-    int optval = 0; /* OOO - tam ma bejt 1!!! */
+    int optval = 1;
     int optlen = sizeof(optval);
 
 
@@ -153,4 +159,14 @@ int Server::acceptNewConnection() {
     }
 
     return clientSocket;
+}
+
+Player *Server::getPlayerBySocket(int socket) {
+    for (Player *p : *Server::players) {
+        if (p->hasSocket() && p->getSocket() == socket) {
+            return p;
+        }
+    }
+
+    return nullptr;
 }

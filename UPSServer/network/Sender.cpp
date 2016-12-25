@@ -29,6 +29,8 @@ void Sender::run() {
             packet = this->pQueue->pop();
 
             send(packet->socket, packet->data, packet->size, MSG_NOSIGNAL);
+
+            delete packet->data;
             delete packet;
         }
     }

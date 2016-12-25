@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <thread>
+#include <vector>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -22,6 +23,7 @@
 #include "../globals.h"
 #include "packet.h"
 #include "../helpers/Logger.h"
+#include "../game/Player.h"
 
 /*
  * Server - singleton class responsible for accepting connections,
@@ -37,6 +39,10 @@ public:
     void init(uint16_t listeningPort);
     /* Starts listening routine */
     std::thread *start();
+
+    /* ooo */
+    static std::vector<Player *> *players;
+    Player *getPlayerBySocket(int socket);
 
 private:
     static Server *INSTANCE;
