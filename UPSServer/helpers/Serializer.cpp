@@ -142,6 +142,11 @@ Message *Serializer::deserialize(uint8_t *data) {
 
     int index = 8;
 
+    if (headToFormatMap->find(header) == headToFormatMap->end()) {
+        LOG_WARNING("RECEIVED INVALID MESSAGE");
+        return nullptr;
+    }
+
     std::string format = (*headToFormatMap)[header];
 
     Message *message = new Message(header, format);
@@ -208,4 +213,13 @@ void fillMapWithValues(std::map<uint32_t, std::string> *headToFormatMap) {
 
     (*headToFormatMap)[H_C_PL_LIST_REQ] = std::string("");
     (*headToFormatMap)[H_S_PL_LIST_ANS] = std::string("is");
+
+    (*headToFormatMap)[H_S_NACK_REAS] = std::string("s");
+
+    (*headToFormatMap)[H_C_JOIN_PLAYER] = std::string("s");
+
+    (*headToFormatMap)[H_S_JOIN_PLAYER] = std::string("s");
+
+    (*headToFormatMap)[H_C_DECLIN_JOIN] = std::string("");
+    (*headToFormatMap)[H_C_ACCEPT_JOIN] = std::string("");
 }

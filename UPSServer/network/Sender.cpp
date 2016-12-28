@@ -39,3 +39,12 @@ void Sender::run() {
 void Sender::registerPacket(packet_t *p) {
     this->pQueue->push(p);
 }
+
+void Sender::registerMessage(Message *mess) {
+    packet_t *p = new packet_t;
+
+    p->data = Serializer::instance()->serialize(mess, &p->size);
+    p->socket = mess->player->getSocket();
+
+    this->registerPacket(p);
+}

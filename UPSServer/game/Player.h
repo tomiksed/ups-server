@@ -30,6 +30,12 @@ public:
     bool isInGame();
     void setInGame(bool inGame);
 
+    bool isAvailible();
+    void setAvailible(bool availible);
+
+    Player *joiningPlayer;
+    Player *askedForJoiningBy;
+
 private:
 
     bool nameSet;
@@ -39,6 +45,7 @@ private:
     int socket;
 
     bool inGame;
+    bool availible;
 };
 
 

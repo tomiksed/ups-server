@@ -31,9 +31,12 @@ void PacketManager::run() {
             packet = this->packetQueue->pop();
 
             Message *mess = Serializer::instance()->deserialize(packet->data);
-            mess->player = Server::instance()->getPlayerBySocket(packet->socket);
 
-            CommandManager::instance()->registerCommand(mess);
+            if (mess != nullptr) {
+                mess->player = Server::instance()->getPlayerBySocket(packet->socket);
+
+                CommandManager::instance()->registerCommand(mess);
+            }
 
             delete packet->data;
             delete packet;

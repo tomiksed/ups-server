@@ -8,6 +8,10 @@ Player::Player() {
     this->socket = -1;
 
     this->inGame = false;
+    this->availible = false;
+
+    this->joiningPlayer = nullptr;
+    this->askedForJoiningBy = nullptr;
 }
 
 Player::Player(int socket) {
@@ -15,6 +19,9 @@ Player::Player(int socket) {
     this->socketSet = true;
 
     this->inGame = false;
+    this->availible = false;
+
+    this->joiningPlayer = nullptr;
 }
 
 Player::Player(int socket, std::string name) {
@@ -24,6 +31,10 @@ Player::Player(int socket, std::string name) {
     this->nameSet = true;
 
     this->inGame = false;
+    this->availible = false;
+
+    this->joiningPlayer = nullptr;
+    this->askedForJoiningBy = nullptr;
 }
 
 bool Player::hasSocket() {
@@ -63,4 +74,12 @@ bool Player::isInGame() {
 
 void Player::setInGame(bool inGame) {
     this->inGame = inGame;
+}
+
+bool Player::isAvailible() {
+    return this->availible;
+}
+
+void Player::setAvailible(bool availible) {
+    this->availible = availible;
 }

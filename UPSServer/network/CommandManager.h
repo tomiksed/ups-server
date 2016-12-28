@@ -11,6 +11,7 @@
 #include "../datatypes/ConcurrentQueue.cpp"
 #include "../datatypes/Message.h"
 #include "../helpers/Serializer.h"
+#include "Server.h"
 
 class CommandManager {
 

@@ -10,6 +10,8 @@
 
 #include "../datatypes/ConcurrentQueue.cpp"
 #include "packet.h"
+#include "../datatypes/Message.h"
+#include "../helpers/Serializer.h"
 
 class Sender {
 public:
@@ -18,7 +20,9 @@ public:
 
     void init();
     void start();
+
     void registerPacket(packet_t *p);
+    void registerMessage(Message *mess);
 
 private:
     static Sender *INSTANCE;

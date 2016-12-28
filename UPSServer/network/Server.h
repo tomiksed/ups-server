@@ -43,6 +43,9 @@ public:
     /* ooo */
     static std::vector<Player *> *players;
     Player *getPlayerBySocket(int socket);
+    Player *getPlayerByName(std::string name);
+
+    void proceedPlayerDisconnection(int socket);
 
 private:
     static Server *INSTANCE;

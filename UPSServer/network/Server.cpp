@@ -45,6 +45,27 @@ std::thread *Server::start() {
     return this->sThread;
 }
 
+void Server::proceedPlayerDisconnection(int socket) {
+    Player *pl;
+    int index = -1;
+
+    for (Player *p : *Server::players) {
+        index++;
+        if (p->hasSocket() && p->getSocket() == socket) {
+            pl = p;
+            break;
+        }
+    }
+
+    if (!pl->isInGame()) {
+        LOG_INFO("ERASING PLAYER " + pl->getName());
+        pl->removeSocket();
+        this->players->erase(this->players->begin() + index);
+    } else {
+        pl->removeSocket();
+    }
+}
+
 void Server::run() {
     int fd, returnValue, readSize;
     fd_set clientSocks, readSocks;
@@ -93,7 +114,7 @@ void Server::run() {
 
                     /* Client disconnected */
                     } else {
-                        /*  ooo - odstraneni clienta */
+                        proceedPlayerDisconnection(fd);
 
                         close(fd);
                         FD_CLR(fd, &clientSocks);
@@ -170,3 +191,14 @@ Player *Server::getPlayerBySocket(int socket) {
 
     return nullptr;
 }
+
+Player *Server::getPlayerByName(std::string name) {
+    for (Player *p : *Server::players) {
+        if (p->getName() == name) {
+            return p;
+        }
+    }
+
+    return nullptr;
+}
+

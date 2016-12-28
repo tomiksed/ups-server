@@ -27,6 +27,16 @@
 #define H_C_PL_LIST_REQ   0x00000006
 #define H_S_PL_LIST_ANS   0x00010007
 
+#define H_S_NACK_REAS     0x00010008
+
+
+#define H_C_JOIN_PLAYER   0x00000009
+
+#define H_S_JOIN_PLAYER   0x0001000A
+
+#define H_C_DECLIN_JOIN   0x0000000B
+#define H_C_ACCEPT_JOIN   0x0000000C
+
 
 #include <cstdint>
 #include <vector>
