@@ -20,7 +20,7 @@ void Sender::init() {
 void Sender::start() {
     this->sThread = new std::thread(&Sender::run, this);
 }
-
+#include <unistd.h>
 void Sender::run() {
     packet_t *packet;
 
@@ -33,6 +33,7 @@ void Sender::run() {
             delete packet->data;
             delete packet;
         }
+        usleep(100000);
     }
 }
 

@@ -110,9 +110,24 @@ void proceedAcceptJoin(Message *mess) {
     Player *asking = mess->player->askedForJoiningBy;
     Player *asked = mess->player;
 
-    if (asking->hasSocket() && asked->hasSocket()) { /* They can start the game */
-        mess->player->askedForJoiningBy = nullptr;
-        mess->player->joiningPlayer = nullptr;
+    mess->player->askedForJoiningBy = nullptr;
+    mess->player->joiningPlayer = nullptr;
+
+    if (asking->joiningPlayer != nullptr) { /* They can start the game */
+
+        LOG_DEBUG("They are starting the game!");
+
+        /* Put them in a game */
+
+        /* Send them a game start message! */
+    } else {
+        /* Asking player disconnected, so inform asked */
+        if (asked->hasSocket()) {
+            Message *ans = new Message(H_S_NACK_REAS, (*Serializer::instance()->headToFormatMap)[H_S_NACK_REAS]);
+            ans->addData(new std::string("Player who asked is gone"));
+            ans->player = asked;
+            Sender::instance()->registerMessage(ans);
+        }
     }
 }
 
@@ -172,6 +187,7 @@ void CommandManager::run() {
 
             delete actualCommand;
         }
+        usleep(100000);
     }
 }
 

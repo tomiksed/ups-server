@@ -60,6 +60,7 @@ void Server::proceedPlayerDisconnection(int socket) {
     if (!pl->isInGame()) {
         LOG_INFO("ERASING PLAYER " + pl->getName());
         pl->removeSocket();
+        pl->joiningPlayer = nullptr;
         this->players->erase(this->players->begin() + index);
     } else {
         pl->removeSocket();

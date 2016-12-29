@@ -41,6 +41,7 @@ void PacketManager::run() {
             delete packet->data;
             delete packet;
         }
+        usleep(100000);
     }
 }
 
