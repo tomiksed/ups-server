@@ -12,6 +12,8 @@ Player::Player() {
 
     this->joiningPlayer = nullptr;
     this->askedForJoiningBy = nullptr;
+
+    this->lost = false;
 }
 
 Player::Player(int socket) {
@@ -22,6 +24,9 @@ Player::Player(int socket) {
     this->availible = false;
 
     this->joiningPlayer = nullptr;
+    this->askedForJoiningBy = nullptr;
+
+    this->lost = false;
 }
 
 Player::Player(int socket, std::string name) {
@@ -35,6 +40,8 @@ Player::Player(int socket, std::string name) {
 
     this->joiningPlayer = nullptr;
     this->askedForJoiningBy = nullptr;
+
+    this->lost = false;
 }
 
 bool Player::hasSocket() {

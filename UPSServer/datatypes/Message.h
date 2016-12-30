@@ -44,6 +44,12 @@
 
 #define H_S_GAME_WON      0x00010010
 
+#define H_S_GAME_ENDED    0x00010011
+
+#define H_S_PL_LOSS       0x00010012
+
+#define INTERNAL_PL_LOST  0x00011111
+
 
 #include <cstdint>
 #include <vector>
@@ -59,8 +65,6 @@ public:
     Message(uint32_t header, std::string format);
 
     void addData(void *data);
-
-
 
     std::string getMsgFormat();
 

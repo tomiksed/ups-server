@@ -47,6 +47,8 @@ public:
 
     void proceedPlayerDisconnection(int socket);
 
+    void deletePlayer(Player *p);
+
 private:
     static Server *INSTANCE;
 

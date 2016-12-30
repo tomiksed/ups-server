@@ -61,6 +61,7 @@ Game *GameManager::registerGame(Player *p1, Player *p2) {
 }
 
 void GameManager::deleteGame(Game *game) {
+    LOG_INFO("Deleting game of " + game->getPlayer1()->getName() + " and " + game->getPlayer2()->getName());
     gameMutex.lock();
 
         int index = -1;

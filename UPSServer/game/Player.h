@@ -36,6 +36,10 @@ public:
     Player *joiningPlayer;
     Player *askedForJoiningBy;
 
+    bool lost;
+
+    int bullshitMessages = 0;
+
 private:
 
     bool nameSet;

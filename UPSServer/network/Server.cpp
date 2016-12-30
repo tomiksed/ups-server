@@ -1,6 +1,8 @@
 #include "Server.h"
 #include "packet.h"
 #include "PacketManager.h"
+#include "../datatypes/Message.h"
+#include "CommandManager.h"
 
 Server *Server::INSTANCE = new Server();
 
@@ -45,7 +47,25 @@ std::thread *Server::start() {
     return this->sThread;
 }
 
+void Server::deletePlayer(Player *p) {
+    Player *pl;
+    int index = -1;
+
+    for (Player *pp : *Server::players) {
+        index++;
+        if (pp->getName() == p->getName()) {
+            break;
+        }
+    }
+
+    this->players->erase(this->players->begin() + index);
+}
+
 void Server::proceedPlayerDisconnection(int socket) {
+    close(socket);
+    FD_CLR(socket, &clientSocks);
+    LOG(log::INFO, std::string("Client disconnected (") + std::to_string(socket) + ")");
+
     Player *pl;
     int index = -1;
 
@@ -57,6 +77,7 @@ void Server::proceedPlayerDisconnection(int socket) {
         }
     }
 
+
     if (!pl->isInGame()) {
         LOG_INFO("ERASING PLAYER " + pl->getName());
         pl->removeSocket();
@@ -64,11 +85,10 @@ void Server::proceedPlayerDisconnection(int socket) {
         this->players->erase(this->players->begin() + index);
     } else {
         pl->removeSocket();
+        Message *lost = new Message(INTERNAL_PL_LOST, std::string(""));
+        lost->player = pl;
+        CommandManager::instance()->registerCommand(lost);
     }
-
-    close(socket);
-    FD_CLR(socket, &clientSocks);
-    LOG(log::INFO, std::string("Client disconnected (") + std::to_string(socket) + ")");
 }
 
 void Server::run() {

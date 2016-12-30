@@ -36,6 +36,15 @@ void PacketManager::run() {
                 mess->player = Server::instance()->getPlayerBySocket(packet->socket);
 
                 CommandManager::instance()->registerCommand(mess);
+            } else {
+                Player *p = Server::instance()->getPlayerBySocket(packet->socket);
+
+                if (p != nullptr) {
+                    p->bullshitMessages++;
+                    if (p->bullshitMessages >= 10) {
+                        Server::instance()->proceedPlayerDisconnection(packet->socket);
+                    }
+                }
             }
 
             delete packet->data;

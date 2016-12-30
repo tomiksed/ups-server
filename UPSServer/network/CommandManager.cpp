@@ -76,8 +76,33 @@ void proceedPlayerListRequest(Message *mess) {
  * Proceeds player reconnection. Checks if the player is realy lost.
  */
 void proceedPlayerReconnection(Message *mess) {
-    LOG_DEBUG(std::string("Player wants to reconnect: ") + *((std::string *) mess->getPayload()->at(0)));
+    Player *newP = mess->player;
 
+    Player *oldP = Server::instance()->getPlayerByName(*((std::string *)mess->getPayload()->at(0)));
+
+
+    if (oldP == nullptr || !oldP->lost) { /* Bullshit, doesn't exist or isn't lost */
+        Message *ans = new Message(H_S_NACK, (*Serializer::instance()->headToFormatMap)[H_S_NACK]);
+        ans->player = newP;
+        Sender::instance()->registerMessage(ans);
+    } else { /**/
+        newP->setName(oldP->getName());
+        newP->setAvailible(false);
+        newP->setInGame(true);
+
+        Game *game = GameManager::instance()->getGameByPlayer(oldP);
+
+        if (game->getPlayer1()->getName() == newP->getName()) {
+            game->setPlayer1(newP);
+        } else {
+            game->setPlayer2(newP);
+        }
+
+        /* Inform oponent and send them complete game info */
+        Player *oponent = GameManager::instance()->getPlayersOponent(newP);
+
+        LOG_DEBUG("Rejoin of " + oponent->getName() + " and " + newP->getName());
+    }
 }
 
 void proceedPlayerJoining(Message *mess) {
@@ -165,6 +190,9 @@ void proceedDeclineJoin(Message *mess) {
         ans->player = asking;
         Sender::instance()->registerMessage(ans);
     }
+
+    asking->setAvailible(true);
+    asked->setAvailible(true);
 }
 
 void processGameMove(Message *message) {
@@ -228,13 +256,71 @@ void processGameMove(Message *message) {
     Sender::instance()->registerMessage(turnInfo);
 }
 
+void proceedGameEnding(Message *message) {
+    Player *p = message->player;
+    Game *game = GameManager::instance()->getGameByPlayer(p);
+
+    Player *oponent;
+    if (game->getPlayer1()->getName() == p->getName()) {
+        oponent = game->getPlayer2();
+    } else {
+        oponent = game->getPlayer1();
+    }
+
+
+    if (oponent->lost) {
+        Server::instance()->deletePlayer(oponent);
+        p->setAvailible(true);
+        p->setInGame(false);
+    } else {
+        p->setInGame(false);
+        oponent->setInGame(false);
+        p->setAvailible(true);
+        oponent->setAvailible(true);
+
+        Message *endInfo = new Message(H_S_GAME_ENDED, (*Serializer::instance()->headToFormatMap)[H_S_GAME_ENDED]);
+        endInfo->player = oponent;
+        Sender::instance()->registerMessage(endInfo);
+    }
+
+    GameManager::instance()->deleteGame(game);
+}
+
 void proceedPlayerLogout(Message *message) {
     Player *p = message->player;
 
     if (p->isInGame()) {
-        LOG_ERROR("Wow, player who is in game wants to log out, that is impossible!");
+        proceedGameEnding(message);
     } else {
         Server::instance()->proceedPlayerDisconnection(p->getSocket());
+    }
+}
+
+void proceedPlayerLost(Message *message) {
+    Player *lost = message->player;
+
+    Game *game = GameManager::instance()->getGameByPlayer(lost);
+    Player *oponent;
+    if (game->getPlayer1()->getName() == lost->getName()) {
+        oponent = game->getPlayer2();
+    } else {
+        oponent = game->getPlayer1();
+    }
+
+    lost->lost = true;
+
+    /* If oponent not lost, inform him. Otherwise delete game and players */
+    if (oponent->lost) {
+        GameManager::instance()->deleteGame(game);
+        oponent->setInGame(false);
+        lost->setInGame(false);
+
+        Server::instance()->deletePlayer(oponent);
+        Server::instance()->deletePlayer(lost);
+    } else {
+        Message *info = new Message(H_S_PL_LOSS, (*Serializer::instance()->headToFormatMap)[H_S_PL_LOSS]);
+        info->player = oponent;
+        Sender::instance()->registerMessage(info);
     }
 }
 
@@ -278,6 +364,9 @@ void CommandManager::run() {
                 case H_C_GAME_MOVE: {
                     processGameMove(actualCommand);
                     break;
+                }
+                case INTERNAL_PL_LOST: {
+                    proceedPlayerLost(actualCommand);
                 }
             }
 
