@@ -227,4 +227,6 @@ void fillMapWithValues(std::map<uint32_t, std::string> *headToFormatMap) {
 
     (*headToFormatMap)[H_C_GAME_MOVE] = std::string("iii"); // typ karty, i, j
     (*headToFormatMap)[H_S_GAME_MOVE] = std::string("iii"); // typ karty, i, j
+
+    (*headToFormatMap)[H_S_GAME_WON] = std::string("siii"); // jmeno viteze + vitezny tah
 }

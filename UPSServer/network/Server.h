@@ -50,6 +50,8 @@ public:
 private:
     static Server *INSTANCE;
 
+    fd_set clientSocks, readSocks;
+
     /* Port which the server is listening on */
     uint16_t listeningPort;
 

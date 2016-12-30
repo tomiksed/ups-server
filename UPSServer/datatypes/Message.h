@@ -42,6 +42,8 @@
 #define H_C_GAME_MOVE     0x0000000E
 #define H_S_GAME_MOVE     0x0001000F
 
+#define H_S_GAME_WON      0x00010010
+
 
 #include <cstdint>
 #include <vector>

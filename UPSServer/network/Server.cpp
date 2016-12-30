@@ -65,11 +65,14 @@ void Server::proceedPlayerDisconnection(int socket) {
     } else {
         pl->removeSocket();
     }
+
+    close(socket);
+    FD_CLR(socket, &clientSocks);
+    LOG(log::INFO, std::string("Client disconnected (") + std::to_string(socket) + ")");
 }
 
 void Server::run() {
     int fd, returnValue, readSize;
-    fd_set clientSocks, readSocks;
     uint8_t *msgBuffer;
 
     FD_ZERO(&clientSocks);
@@ -116,10 +119,6 @@ void Server::run() {
                     /* Client disconnected */
                     } else {
                         proceedPlayerDisconnection(fd);
-
-                        close(fd);
-                        FD_CLR(fd, &clientSocks);
-                        LOG(log::INFO, std::string("Client disconnected (") + std::to_string(fd) + ")");
                     }
                 }
             }

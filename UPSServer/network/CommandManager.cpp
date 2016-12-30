@@ -183,7 +183,34 @@ void processGameMove(Message *message) {
     game->field[moveI][moveJ] = cardType;
 
     /* Was it winning move? */
+    if (GameManager::instance()->isGameWon(game, moveI, moveJ)) {
+        /* Inform both */
+        Message *turnInfo1 = new Message(H_S_GAME_WON, (*Serializer::instance()->headToFormatMap)[H_S_GAME_WON]);
+        turnInfo1->addData(new std::string(turnPlayer->getName()));
+        turnInfo1->addData(message->getPayload()->at(0));
+        turnInfo1->addData(message->getPayload()->at(1));
+        turnInfo1->addData(message->getPayload()->at(2));
 
+        Message *turnInfo2 = new Message(H_S_GAME_WON, (*Serializer::instance()->headToFormatMap)[H_S_GAME_WON]);
+        turnInfo2->addData(new std::string(turnPlayer->getName()));
+        turnInfo2->addData(message->getPayload()->at(0));
+        turnInfo2->addData(message->getPayload()->at(1));
+        turnInfo2->addData(message->getPayload()->at(2));
+
+        turnInfo1->player = turnPlayer;
+        turnInfo2->player = oponent;
+
+        Sender::instance()->registerMessage(turnInfo1);
+        Sender::instance()->registerMessage(turnInfo2);
+
+        /* Delete game record */
+        turnPlayer->setInGame(false);
+        oponent->setInGame(false);
+
+        GameManager::instance()->deleteGame(game);
+
+        return;
+    }
 
     game->playerOnTurn = oponent;
     /* ******************* */
@@ -194,6 +221,16 @@ void processGameMove(Message *message) {
     turnInfo->addData(message->getPayload()->at(2));
     turnInfo->player = oponent;
     Sender::instance()->registerMessage(turnInfo);
+}
+
+void proceedPlayerLogout(Message *message) {
+    Player *p = message->player;
+
+    if (p->isInGame()) {
+        LOG_ERROR("Wow, player who is in game wants to log out, that is impossible!");
+    } else {
+        Server::instance()->proceedPlayerDisconnection(p->getSocket());
+    }
 }
 
 void CommandManager::run() {
@@ -218,7 +255,7 @@ void CommandManager::run() {
                     break;
                 }
                 case H_C_PL_LOGOUT: {
-                    /* ooo - dodelat logout */
+                    proceedPlayerLogout(actualCommand);
                     break;
                 }
                 case H_C_JOIN_PLAYER: {

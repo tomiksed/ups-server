@@ -60,7 +60,24 @@ Game *GameManager::registerGame(Player *p1, Player *p2) {
     return g;
 }
 
-bool controlBlack(Game *game, bool ctrlField[8][8], int i, int j) {
+void GameManager::deleteGame(Game *game) {
+    gameMutex.lock();
+
+        int index = -1;
+
+        for (Game *g : *this->games) {
+            index++;
+            if (g->getId() == game->getId()) {
+                break;
+            }
+        }
+
+        this->games->erase(this->games->begin() + index);
+
+    gameMutex.unlock();
+}
+
+bool controlBlack(Game *game, bool ctrlField[8][8], int i, int j, int fromI, int fromJ) {
     if (i < 0 || i > 7 || j < 0 || j > 7) return false;
     if (game->field[i][j] == 0) return false;
 
@@ -72,33 +89,39 @@ bool controlBlack(Game *game, bool ctrlField[8][8], int i, int j) {
 
     switch (game->field[i][j]) {
         case 1: {
-            return controlBlack(game, ctrlField, i - 1, j) || controlBlack(game, ctrlField, i + 1, j);
+            if ((fromI != i - 1 || fromJ != j) && controlBlack(game, ctrlField, i - 1, j, i, j)) return true;
+            if ((fromI != i + 1 || fromJ != j) && controlBlack(game, ctrlField, i + 1, j, i, j)) return true;
             break;
         }
         case 2: {
-            return controlBlack(game, ctrlField, i, j - 1) || controlBlack(game, ctrlField, i + 1, j);
+            if ((fromI != i || fromJ != j - 1) && controlBlack(game, ctrlField, i, j - 1, i, j)) return true;
+            if ((fromI != i || fromJ != j + 1) && controlBlack(game, ctrlField, i, j + 1, i, j)) return true;
             break;
         }
         case 3: {
-            return controlBlack(game, ctrlField, i + 1, j) || controlBlack(game, ctrlField, i, j + 1);
+            if ((fromI != i + 1 || fromJ != j) && controlBlack(game, ctrlField, i + 1, j, i, j)) return true;
+            if ((fromI != i || fromJ != j + 1) && controlBlack(game, ctrlField, i, j + 1, i, j)) return true;
             break;
         }
         case 4: {
-            return controlBlack(game, ctrlField, i - 1, j) || controlBlack(game, ctrlField, i, j + 1);
+            if ((fromI != i - 1 || fromJ != j) && controlBlack(game, ctrlField, i - 1, j, i, j)) return true;
+            if ((fromI != i || fromJ != j + 1) && controlBlack(game, ctrlField, i, j + 1, i, j)) return true;
             break;
         }
         case 5: {
-            return controlBlack(game, ctrlField, i - 1, j) || controlBlack(game, ctrlField, i, j - 1);
+            if ((fromI != i - 1 || fromJ != j) && controlBlack(game, ctrlField, i - 1, j, i, j)) return true;
+            if ((fromI != i || fromJ != j - 1) && controlBlack(game, ctrlField, i, j - 1, i, j)) return true;
             break;
         }
         case 6: {
-            return controlBlack(game, ctrlField, i + 1, j) || controlBlack(game, ctrlField, i, j - 1);
+            if ((fromI != i + 1 || fromJ != j) && controlBlack(game, ctrlField, i + 1, j, i, j)) return true;
+            if ((fromI != i || fromJ != j - 1) && controlBlack(game, ctrlField, i, j - 1, i, j)) return true;
             break;
         }
     }
 }
 
-bool controlWhite(Game *game, bool ctrlField[8][8], int i, int j) {
+bool controlWhite(Game *game, bool ctrlField[8][8], int i, int j, int fromI, int fromJ) {
     if (i < 0 || i > 7 || j < 0 || j > 7) return false;
     if (game->field[i][j] == 0) return false;
 
@@ -110,27 +133,33 @@ bool controlWhite(Game *game, bool ctrlField[8][8], int i, int j) {
 
     switch (game->field[i][j]) {
         case 1: {
-            return controlWhite(game, ctrlField, i, j - 1) || controlBlack(game, ctrlField, i, j + 1);
+            if ((fromI != i || fromJ != j - 1) && controlWhite(game, ctrlField, i, j - 1, i, j)) return true;
+            if ((fromI != i || fromJ != j + 1) && controlWhite(game, ctrlField, i, j + 1, i, j)) return true;
             break;
         }
         case 2: {
-            return controlWhite(game, ctrlField, i - 1, j) || controlBlack(game, ctrlField, i, j + 1);
+            if ((fromI != i - 1 || fromJ != j) && controlWhite(game, ctrlField, i - 1, j, i, j)) return true;
+            if ((fromI != i + 1 || fromJ != j) && controlWhite(game, ctrlField, i + 1, j, i, j)) return true;
             break;
         }
         case 3: {
-            return controlWhite(game, ctrlField, i - 1, j) || controlBlack(game, ctrlField, i, j - 1);
+            if ((fromI != i - 1 || fromJ != j) && controlWhite(game, ctrlField, i - 1, j, i, j)) return true;
+            if ((fromI != i || fromJ != j - 1) && controlWhite(game, ctrlField, i, j - 1, i, j)) return true;
             break;
         }
         case 4: {
-            return controlWhite(game, ctrlField, i + 1, j) || controlBlack(game, ctrlField, i, j - 1);
+            if ((fromI != i + 1 || fromJ != j) && controlWhite(game, ctrlField, i + 1, j, i, j)) return true;
+            if ((fromI != i || fromJ != j - 1) && controlWhite(game, ctrlField, i, j - 1, i, j)) return true;
             break;
         }
         case 5: {
-            return controlWhite(game, ctrlField, i + 1, j) || controlBlack(game, ctrlField, i, j + 1);
+            if ((fromI != i + 1 || fromJ != j) && controlWhite(game, ctrlField, i + 1, j, i, j)) return true;
+            if ((fromI != i || fromJ != j + 1) && controlWhite(game, ctrlField, i, j + 1, i, j)) return true;
             break;
         }
         case 6: {
-            return controlWhite(game, ctrlField, i - 1, j) || controlBlack(game, ctrlField, i, j + 1);
+            if ((fromI != i - 1 || fromJ != j) && controlWhite(game, ctrlField, i - 1, j, i, j)) return true;
+            if ((fromI != i || fromJ != j + 1) && controlWhite(game, ctrlField, i, j + 1, i, j)) return true;
             break;
         }
     }
@@ -144,9 +173,8 @@ bool GameManager::isGameWon(Game *game, int moveI, int moveJ) {
             ctrlField[i][j] = false;
         }
     }
-    ctrlField[moveI][moveJ] = true;
 
-    if (controlBlack(game, ctrlField, moveI, moveJ)) {
+    if (controlWhite(game, ctrlField, moveI, moveJ, moveI, moveJ)) {
         return true;
     }
 
@@ -155,9 +183,8 @@ bool GameManager::isGameWon(Game *game, int moveI, int moveJ) {
             ctrlField[i][j] = false;
         }
     }
-    ctrlField[moveI][moveJ] = true;
 
-    if (controlWhite(game, ctrlField, moveI, moveJ)) {
+    if (controlBlack(game, ctrlField, moveI, moveJ, moveI, moveJ)) {
         return true;
     }
 

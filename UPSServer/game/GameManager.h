@@ -9,6 +9,7 @@
 #include <vector>
 #include <mutex>
 #include "Game.h"
+#include "../helpers/Logger.h"
 
 class GameManager {
 public:
@@ -21,6 +22,8 @@ public:
     Game *registerGame(Player *p1, Player *p2);
 
     bool isGameWon(Game *game, int moveI, int moveJ);
+
+    void deleteGame(Game *game);
 
 private:
     GameManager();
