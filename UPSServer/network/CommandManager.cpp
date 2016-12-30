@@ -1,6 +1,8 @@
 #include "CommandManager.h"
 #include "packet.h"
 #include "Sender.h"
+#include "../game/Game.h"
+#include "../game/GameManager.h"
 
 CommandManager *CommandManager::INSTANCE = new CommandManager();
 
@@ -115,11 +117,27 @@ void proceedAcceptJoin(Message *mess) {
 
     if (asking->joiningPlayer != nullptr) { /* They can start the game */
 
-        LOG_DEBUG("They are starting the game!");
+        LOG_INFO("Starting game between " + asking->getName() + " and " + asked->getName());
 
         /* Put them in a game */
+        Game *game = GameManager::instance()->registerGame(asking, asked);
+        asking->setInGame(true);
+        asked->setInGame(true);
+        game->playerOnTurn = asking;
 
         /* Send them a game start message! */
+        Message *p1GameInfo = new Message(H_S_GAME_START, (*Serializer::instance()->headToFormatMap)[H_S_GAME_START]);
+        p1GameInfo->addData(new std::string(asking->getName()));
+        p1GameInfo->addData(new std::string(asked->getName()));
+        p1GameInfo->player = asking;
+
+        Message *p2GameInfo = new Message(H_S_GAME_START, (*Serializer::instance()->headToFormatMap)[H_S_GAME_START]);
+        p2GameInfo->addData(new std::string(asking->getName()));
+        p2GameInfo->addData(new std::string(asking->getName()));
+        p2GameInfo->player = asked;
+
+        Sender::instance()->registerMessage(p1GameInfo);
+        Sender::instance()->registerMessage(p2GameInfo);
     } else {
         /* Asking player disconnected, so inform asked */
         if (asked->hasSocket()) {
@@ -144,6 +162,38 @@ void proceedDeclineJoin(Message *mess) {
         ans->player = asking;
         Sender::instance()->registerMessage(ans);
     }
+}
+
+void processGameMove(Message *message) {
+    Player *turnPlayer = message->player;
+    Game *game = GameManager::instance()->getGameByPlayer(turnPlayer);
+
+    Player *oponent;
+    if (game->getPlayer1()->getName() == turnPlayer->getName()) {
+        oponent = game->getPlayer2();
+    } else {
+        oponent = game->getPlayer1();
+    }
+
+    /* Turn processing !!! */
+    uint32_t cardType = *((uint32_t *) message->getPayload()->at(0));
+    uint32_t moveI    = *((uint32_t *) message->getPayload()->at(1));
+    uint32_t moveJ    = *((uint32_t *) message->getPayload()->at(2));
+
+    game->field[moveI][moveJ] = cardType;
+
+    /* Was it winning move? */
+
+
+    game->playerOnTurn = oponent;
+    /* ******************* */
+
+    Message *turnInfo = new Message(H_S_GAME_MOVE, (*Serializer::instance()->headToFormatMap)[H_S_GAME_MOVE]);
+    turnInfo->addData(message->getPayload()->at(0));
+    turnInfo->addData(message->getPayload()->at(1));
+    turnInfo->addData(message->getPayload()->at(2));
+    turnInfo->player = oponent;
+    Sender::instance()->registerMessage(turnInfo);
 }
 
 void CommandManager::run() {
@@ -181,6 +231,10 @@ void CommandManager::run() {
                 }
                 case H_C_ACCEPT_JOIN: {
                     proceedAcceptJoin(actualCommand);
+                    break;
+                }
+                case H_C_GAME_MOVE: {
+                    processGameMove(actualCommand);
                     break;
                 }
             }

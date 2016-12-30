@@ -207,19 +207,24 @@ void fillMapWithValues(std::map<uint32_t, std::string> *headToFormatMap) {
     (*headToFormatMap)[H_S_ACK] = std::string("");
     (*headToFormatMap)[H_S_PING] = std::string("");
 
-    (*headToFormatMap)[H_C_NEW_PL] = std::string("s");
-    (*headToFormatMap)[H_C_PL_RECONN] = std::string("s");
+    (*headToFormatMap)[H_C_NEW_PL] = std::string("s"); // jmeno, pod kterym se chci zaregistrovat
+    (*headToFormatMap)[H_C_PL_RECONN] = std::string("s"); // jmeno, pod kterym se chci znovu pripojit
     (*headToFormatMap)[H_C_PL_LOGOUT] = std::string("");
 
     (*headToFormatMap)[H_C_PL_LIST_REQ] = std::string("");
-    (*headToFormatMap)[H_S_PL_LIST_ANS] = std::string("is");
+    (*headToFormatMap)[H_S_PL_LIST_ANS] = std::string("is"); // pocet hracu a jejich hmena oddelena ';'
 
-    (*headToFormatMap)[H_S_NACK_REAS] = std::string("s");
+    (*headToFormatMap)[H_S_NACK_REAS] = std::string("s"); // duvod odmitnuti
 
-    (*headToFormatMap)[H_C_JOIN_PLAYER] = std::string("s");
+    (*headToFormatMap)[H_C_JOIN_PLAYER] = std::string("s"); // jmeno hrace k pripojeni
 
-    (*headToFormatMap)[H_S_JOIN_PLAYER] = std::string("s");
+    (*headToFormatMap)[H_S_JOIN_PLAYER] = std::string("s"); // jmeno hrace, kterej se chce pripojit
 
     (*headToFormatMap)[H_C_DECLIN_JOIN] = std::string("");
     (*headToFormatMap)[H_C_ACCEPT_JOIN] = std::string("");
+
+    (*headToFormatMap)[H_S_GAME_START] = std::string("ss"); // jmeno hrace, co zacina + jmeno onopenta
+
+    (*headToFormatMap)[H_C_GAME_MOVE] = std::string("iii"); // typ karty, i, j
+    (*headToFormatMap)[H_S_GAME_MOVE] = std::string("iii"); // typ karty, i, j
 }

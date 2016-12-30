@@ -37,6 +37,11 @@
 #define H_C_DECLIN_JOIN   0x0000000B
 #define H_C_ACCEPT_JOIN   0x0000000C
 
+#define H_S_GAME_START    0x0001000D
+
+#define H_C_GAME_MOVE     0x0000000E
+#define H_S_GAME_MOVE     0x0001000F
+
 
 #include <cstdint>
 #include <vector>
