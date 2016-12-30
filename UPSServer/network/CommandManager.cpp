@@ -115,6 +115,9 @@ void proceedAcceptJoin(Message *mess) {
     mess->player->askedForJoiningBy = nullptr;
     mess->player->joiningPlayer = nullptr;
 
+    asking->setAvailible(false);
+    asked->setAvailible(false);
+
     if (asking->joiningPlayer != nullptr) { /* They can start the game */
 
         LOG_INFO("Starting game between " + asking->getName() + " and " + asked->getName());
@@ -206,6 +209,8 @@ void processGameMove(Message *message) {
         /* Delete game record */
         turnPlayer->setInGame(false);
         oponent->setInGame(false);
+        turnPlayer->setAvailible(true);
+        oponent->setAvailible(true);
 
         GameManager::instance()->deleteGame(game);
 
