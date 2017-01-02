@@ -101,17 +101,22 @@ void proceedPlayerReconnection(Message *mess) {
         /* Inform oponent and send them complete game info */
         Player *oponent = GameManager::instance()->getPlayersOponent(newP);
 
-        /* Get game state string */
-
         Message *gameCon1 = new Message(H_S_GAME_CON, (*Serializer::instance()->headToFormatMap)[H_S_GAME_CON]);
         gameCon1->addData(new std::string(game->playerOnTurn->getName()));
+        gameCon1->addData(new std::string(oponent->getName()));
         gameCon1->addData(game->getGameString());
         gameCon1->player = newP;
 
         Message *gameCon2 = new Message(H_S_GAME_CON, (*Serializer::instance()->headToFormatMap)[H_S_GAME_CON]);
         gameCon2->addData(new std::string(game->playerOnTurn->getName()));
+        gameCon2->addData(new std::string(newP->getName()));
         gameCon2->addData(game->getGameString());
         gameCon2->player = oponent;
+
+        Sender::instance()->registerMessage(gameCon1);
+        Sender::instance()->registerMessage(gameCon2);
+
+        Server::instance()->deletePlayer(oldP);
     }
 }
 
@@ -252,6 +257,7 @@ void processGameMove(Message *message) {
         oponent->setInGame(false);
         turnPlayer->setAvailible(true);
         oponent->setAvailible(true);
+
 
         GameManager::instance()->deleteGame(game);
 

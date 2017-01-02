@@ -25,9 +25,10 @@ void Sender::run() {
     packet_t *packet;
 
     while (true) {
-        if (!this->pQueue->empty()) {
+        while (!this->pQueue->empty()) {
             packet = this->pQueue->pop();
 
+            //LOG_DEBUG("Sending message to: " + std::to_string(packet->socket));
             send(packet->socket, packet->data, packet->size, MSG_NOSIGNAL);
 
             delete packet->data;
