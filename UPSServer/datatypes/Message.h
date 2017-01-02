@@ -48,6 +48,8 @@
 
 #define H_S_PL_LOSS       0x00010012
 
+#define H_S_GAME_CON      0x00010013
+
 #define INTERNAL_PL_LOST  0x00011111
 
 

@@ -27,7 +27,7 @@ void PacketManager::run() {
     packet_t *packet;
 
     while(true) {
-        if (!this->packetQueue->empty()) {
+        while (!this->packetQueue->empty()) {
             packet = this->packetQueue->pop();
 
             Message *mess = Serializer::instance()->deserialize(packet->data);

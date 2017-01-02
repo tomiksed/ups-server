@@ -25,3 +25,18 @@ void Game::setPlayer1(Player *nP) {
 void Game::setPlayer2(Player *nP) {
     this->p2 = nP;
 }
+
+std::string *Game::getGameString() {
+    std::string *gS = new std::string("");
+
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            if (gS->size() != 0) {
+                gS->append(";");
+            }
+            gS->append(std::to_string(this->field[i][j]));
+        }
+    }
+
+    return gS;
+}

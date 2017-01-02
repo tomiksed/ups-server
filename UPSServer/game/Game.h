@@ -25,6 +25,9 @@ public:
     void setPlayer2(Player *nP);
 
     int getId() { return this->id; }
+
+    std::string *getGameString();
+
 private:
 
     int id;

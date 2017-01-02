@@ -57,7 +57,7 @@ void proceedPlayerListRequest(Message *mess) {
     *resultSize = 0;
 
     for (Player *p : *Server::instance()->players) {
-        if (!p->isInGame() && p->hasSocket() && p->hasName() && p->getName() != mess->player->getName()) {
+        if (!p->isInGame() && p->isAvailible() && p->hasSocket() && p->hasName() && p->getName() != mess->player->getName()) {
             if (*resultSize > 0) result->append(";");
             result->append(p->getName());
             (*resultSize)++;
@@ -101,7 +101,17 @@ void proceedPlayerReconnection(Message *mess) {
         /* Inform oponent and send them complete game info */
         Player *oponent = GameManager::instance()->getPlayersOponent(newP);
 
-        LOG_DEBUG("Rejoin of " + oponent->getName() + " and " + newP->getName());
+        /* Get game state string */
+
+        Message *gameCon1 = new Message(H_S_GAME_CON, (*Serializer::instance()->headToFormatMap)[H_S_GAME_CON]);
+        gameCon1->addData(new std::string(game->playerOnTurn->getName()));
+        gameCon1->addData(game->getGameString());
+        gameCon1->player = newP;
+
+        Message *gameCon2 = new Message(H_S_GAME_CON, (*Serializer::instance()->headToFormatMap)[H_S_GAME_CON]);
+        gameCon2->addData(new std::string(game->playerOnTurn->getName()));
+        gameCon2->addData(game->getGameString());
+        gameCon2->player = oponent;
     }
 }
 
@@ -126,6 +136,9 @@ void proceedPlayerJoining(Message *mess) {
         Sender::instance()->registerMessage(joinRequest);
         /* Set him the player that asked for joining - to be easily found */
         oponent->askedForJoiningBy = requesting;
+
+        requesting->setAvailible(false);
+        oponent->setAvailible(false);
     } else { /* Isn't joinable */
         Message *nack = new Message(H_S_NACK, (*Serializer::instance()->headToFormatMap)[H_S_NACK]);
         nack->player = requesting;
@@ -328,7 +341,7 @@ void CommandManager::run() {
     Message *actualCommand;
 
     while (true) {
-        if (!this->commandQueue->empty()) {
+        while (!this->commandQueue->empty()) {
             actualCommand = this->commandQueue->pop();
 
             uint32_t header = actualCommand->getHeader();

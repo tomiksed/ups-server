@@ -233,4 +233,6 @@ void fillMapWithValues(std::map<uint32_t, std::string> *headToFormatMap) {
     (*headToFormatMap)[H_S_GAME_ENDED] = std::string("");
 
     (*headToFormatMap)[H_S_PL_LOSS] = std::string("");
+
+    (*headToFormatMap)[H_S_GAME_CON] = std::string("ss"); // hrac na tahu, hraci pole
 }
